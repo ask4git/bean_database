@@ -17,68 +17,79 @@ class BeanDatabase(dict):
 
     def processing(self):
         while True:
-            print('=========================\n어떤 명령을 실행할까요?')
+            print('=========================')
             order = input('update : 1\nsearch : 2\nexit : 0\ninput? : ')
-            if order == '1':
-                self.search_key()
-            elif order == '2':
-                self.search_value()
-            elif order == '0':
-                print('안녕히 가세용!')
-                break
-            else:
-                print('다시 입력해주세요!')
+
+            try:
+                if order == '1':
+                    self.search_key()
+                elif order == '2':
+                    self.search_value()
+                elif order == '0':
+                    print('Bye!')
+                    break
+                else:
+                    raise NotFoundOrder(order)
+            except NotFoundKey as error:
+                print(error)
+            except NotFoundOrder as error:
+                print(error)
 
     def search_key(self):
         """
         값을 업데이트
-        :return:
         """
-        key_name = input('어떤 값을 업데이트할까요? : ')
+        key_name = input('Value to update? : ')
 
-        if key_name in self:
-            # key is valid
+        if self.key_validation_check(key_name):
             self.update_value(key_name)
-        else:
-            print('키가 존재하지 않아요!')
-
-    def update_value(self, key_name):
-        value = input('값을 입력하세요. : ')
-        self.update({key_name: value})
-        print('업데이트 성공!')
 
     def search_value(self):
         """
         값을 검색
-        :return:
         """
-        key_name = input('어떤 값을 출력할까요? : ')
-        if key_name in self:
-            # key is valid
-            print('출력값 : {}'.format(self.get(key_name)))
-        else:
-            print('키가 존재하지 않아요!')
+        key_name = input('Value to print? : ')
 
-    def key_validation_check(self):
+        if self.key_validation_check(key_name):
+            self.print_key(key_name)
+
+    def update_value(self, key_name):
+        value = input('Please input value : ')
+        self.update({key_name: value})
+        print('Update success!')
+
+    def key_validation_check(self, key):
         """
         입력할 키가 존재하면 True, 없으면 False
         :return:
         """
-        pass
+        if key in self:
+            return True
+        else:
+            raise NotFoundKey(key)
 
-    def not_find_key_error(self):
-        """
-        키가 없을때 에러를 출력
-        :return:
-        """
-        pass
-
-    def print_key(self):
+    def print_key(self, key_name):
         """
         값을 출력
         :return:
         """
-        pass
+        print(self.get(key_name))
+
+
+class NotFoundKey(Exception):
+    def __init__(self, key_name):
+        self.key_name = key_name
+
+    def __str__(self):
+        return f'[NotFoundKey] {self.key_name} is not valid key'
+
+
+class NotFoundOrder(Exception):
+    def __init__(self, order):
+        self.order = order
+
+    def __str__(self):
+        return f'[NotFoundOrder] {self.order} is not valid order'
 
 
 def main():
